@@ -13,6 +13,7 @@ PIP=.venv/bin/pip
 PYTHON_VENV=.venv/bin/python
 
 # создание виртуального окружения
+# author - Zhilin Daniil
 setup:
 	@echo "Setup venv, install requirements and create .env"
 	$(PYTHON) -m venv .venv
