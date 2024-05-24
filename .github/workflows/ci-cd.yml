@@ -64,15 +64,7 @@ jobs:
         DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
       run: make push
 
-    - name: Execute remote SSH commands using password
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_LOGIN }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        port: 22
-
-    - name: Deploy to server
+    - name: Execute remote SSH commands using password and deploy
       env:
         SSH_HOST: ${{ secrets.SERVER_HOST }}
         SSH_USERNAME: ${{ secrets.SERVER_LOGIN }}
@@ -80,11 +72,16 @@ jobs:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_LOGIN }}@${{ secrets.SERVER_HOST }} << 'EOF'
-          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
-          docker stop your-container || true
-          docker rm your-container || true
-          docker run -d --name your-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
-        EOF
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_LOGIN }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: 22
+      run: |        
+        docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+        docker stop ${{ secrets.DOCKER_REPO }} || true
+        docker rm ${{ secrets.DOCKER_REPO }} || true
+        docker run -d --name ${{ secrets.DOCKER_REPO }} -e TELEGRAM_BOT_TOKEN=$(TELEGRAM_BOT_TOKEN) -e OPENAI_API_KEY=$(OPENAI_API_KEY) ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+        
 
