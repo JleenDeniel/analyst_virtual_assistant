@@ -35,6 +35,7 @@ def generate_response(text):
         thread_id=thread.id,
         assistant_id=assistant.id,
         )
+    messages = ''
     if run.status == 'completed': 
         messages = client.beta.threads.messages.list(
             thread_id=thread.id)
