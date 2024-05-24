@@ -57,4 +57,9 @@ jobs:
       run: make build
 
     - name: Push Docker image
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
       run: make push
