@@ -1,5 +1,5 @@
 from telegram import Update
-from config.openai_client import client 
+from config.openai_client import client, assistant
 
 async def chatgpt_reply(update: Update, context):
     # текст входящего сообщения
@@ -11,6 +11,7 @@ async def chatgpt_reply(update: Update, context):
         messages=[{"role": "user", "content": text}],
         max_tokens=1024,
         temperature=0.5,
+        assistant_id=assistant.id
     )
 
     # ответ
