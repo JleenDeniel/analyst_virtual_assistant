@@ -1,19 +1,14 @@
 from telegram import Update
-from config.openai_client import client, assistant
+from config.openai_client import client, assistant, generate_response
 
 async def chatgpt_reply(update: Update, context):
     # текст входящего сообщения
     text = update.message.text
     assistant_ = assistant
-    
+
     
     # запрос
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": text}],
-        max_tokens=1024,
-        temperature=0.5
-    )
+    response = generate_response(text)
 
     # ответ
     reply = response.choices[0].message.content.strip()
