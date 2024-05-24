@@ -78,7 +78,7 @@ jobs:
         username: ${{ secrets.SERVER_LOGIN }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: 22
-      run: |        
+                
         docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
         docker stop ${{ secrets.DOCKER_REPO }} || true
         docker rm ${{ secrets.DOCKER_REPO }} || true
