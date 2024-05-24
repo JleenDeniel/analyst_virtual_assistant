@@ -70,5 +70,5 @@ jobs:
         port: 22
         run:
         script: |
-            make dockerpull
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
             make dockerrun
