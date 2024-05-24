@@ -1,54 +1,68 @@
 from openai import OpenAI 
 from .tokens import OPENAI_API_KEY 
+import logging
+
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
+
+MODE = range(1)
 
 client = OpenAI(
     api_key = OPENAI_API_KEY
 )
 
-assistant = client.beta.assistants.create(
+
+
+def generate_response(text):
+
+    assistant = client.beta.assistants.create(
     name="Virtial assistant for analyst",
     model="gpt-3.5-turbo",
 )
 
-vector_store = client.beta.vector_stores.create(name="Product descriptions")
+    vector_store = client.beta.vector_stores.create(name="Product descriptions")
 
-file_paths = ["config/products_parameters.md"]
-file_streams = [open(path, "rb") for path in file_paths]
+    file_paths = ["config/products_parameters.md"]
+    file_streams = [open(path, "rb") for path in file_paths]
 
-file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
-    vector_store_id=vector_store.id, files=file_streams
-)
-
-assistant = client.beta.assistants.update(
-    assistant_id=assistant.id,
-    tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
-)
-
-def generate_response(text):
-    thread = client.beta.threads.create()
-    message = client.beta.threads.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content=text
+    file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
+        vector_store_id=vector_store.id, files=file_streams
     )
+
+    assistant = client.beta.assistants.update(
+        assistant_id=assistant.id,
+        tool_resources={"file_search": {"vector_store_ids": [vector_store.id]}},
+    )
+    thread = client.beta.threads.create()
+    
+
     run = client.beta.threads.runs.create_and_poll(
         thread_id=thread.id,
         assistant_id=assistant.id,
         )
-    messages = ''
+    
+    if run.status == 'completed':
+        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        message_content = messages.data[0].content[0].text
 
-    messages = list(client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id))
+        # Remove annotations
+        annotations = message_content.annotations
+        for annotation in annotations:
+            message_content.value = message_content.value.replace(annotation.text, '')
 
-    message_content = messages[0].content[0].text
-    annotations = message_content.annotations
-    citations = []
-    for index, annotation in enumerate(annotations):
-        message_content.value = message_content.value.replace(annotation.text, f"[{index}]")
-        if file_citation := getattr(annotation, "file_citation", None):
-            cited_file = client.files.retrieve(file_citation.file_id)
-            citations.append(f"[{index}] {cited_file.filename}")
-    print(message_content.value)
-    return message_content.value
+        response_message = message_content.value
+        response_message = response_message.strip("`")
+        response_message = response_message.strip("json")
+        response_message = response_message.strip()
+        # Remove the word json and backticks
+        print(response_message)
+        return response_message
+    
     # response = client.chat.completions.create(
     #     model="gpt-3.5-turbo",
     #     messages=messages,
