@@ -63,3 +63,25 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
       run: make push
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to server
+      env:
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_USERNAME: ${{ secrets.SERVER_LOGIN }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_LOGIN }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+          docker stop your-container || true
+          docker rm your-container || true
+          docker run -d --name your-container -p 80:80 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+        EOF
+
