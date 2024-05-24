@@ -25,12 +25,29 @@ assistant = client.beta.assistants.update(
 )
 
 def generate_response(text):
+    thread = client.beta.threads.create()
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=text
+    )
+    run = client.beta.threads.runs.create_and_poll(
+        thread_id=thread.id,
+        assistant_id=assistant.id,
+        )
+    if run.status == 'completed': 
+        messages = client.beta.threads.messages.list(
+            thread_id=thread.id)
+        print(messages)
+    else:
+        print(run.status)
+
+
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "assistant", "content": text}],
+        messages=messages,
         max_tokens=1024,
         temperature=0.5,
-        assistant_id=assistant.id,
     )
     print(response.choices[0].message.content.strip())
     return response.choices[0].message.content.strip()
