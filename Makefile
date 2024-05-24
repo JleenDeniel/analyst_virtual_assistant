@@ -19,6 +19,9 @@ build:
 dockerrun:
 	docker run --rm -e TELEGRAM_BOT_TOKEN=$(TELEGRAM_BOT) -e OPENAI_API_KEY=$(OPENAI_API) $(USERNAME)/$(REPO):$(TAG)
 
+dockerpull:
+	docker pull $(USERNAME)/$(REPO):$(TAG)
+
 # Push the Docker image to Docker Hub
 push:
 	docker push $(USERNAME)/$(REPO):$(TAG)
