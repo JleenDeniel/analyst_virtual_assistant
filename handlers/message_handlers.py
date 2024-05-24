@@ -4,14 +4,13 @@ from config.openai_client import client, assistant, generate_response
 async def chatgpt_reply(update: Update, context):
     # текст входящего сообщения
     text = update.message.text
-    assistant_ = assistant
 
-    
-    # запрос
-    response = generate_response(text)
+    # # запрос
+    # response = generate_response(text)
 
-    # ответ
-    reply = response.choices[0].message.content.strip()
+    # # ответ
+    # reply = response.choices[0].message.content.strip()
+    reply = generate_response(text=text)
 
     # перенаправление ответа в Telegram
     await update.message.reply_text(reply)   

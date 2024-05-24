@@ -36,22 +36,27 @@ def generate_response(text):
         assistant_id=assistant.id,
         )
     messages = ''
-    if run.status == 'completed': 
-        messages = client.beta.threads.messages.list(
-            thread_id=thread.id)
-        print(messages)
-    else:
-        print(run.status)
 
+    messages = list(client.beta.threads.messages.list(thread_id=thread.id, run_id=run.id))
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        max_tokens=1024,
-        temperature=0.5,
-    )
-    print(response.choices[0].message.content.strip())
-    return response.choices[0].message.content.strip()
+    message_content = messages[0].content[0].text
+    annotations = message_content.annotations
+    citations = []
+    for index, annotation in enumerate(annotations):
+        message_content.value = message_content.value.replace(annotation.text, f"[{index}]")
+        if file_citation := getattr(annotation, "file_citation", None):
+            cited_file = client.files.retrieve(file_citation.file_id)
+            citations.append(f"[{index}] {cited_file.filename}")
+    print(message_content.value)
+    return message_content.value
+    # response = client.chat.completions.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=messages,
+    #     max_tokens=1024,
+    #     temperature=0.5,
+    # )
+    # print(response.choices[0].message.content.strip())
+    # return response.choices[0].message.content.strip()
 
 def generate_transcription(audio_bytes):
     transcription = client.audio.transcriptions.create(
