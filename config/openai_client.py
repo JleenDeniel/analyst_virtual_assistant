@@ -12,7 +12,7 @@ model="gpt-3.5-turbo",
 
 vector_store = client.beta.vector_stores.create(name="Product descriptions")
 
-file_paths = ["products_parameters.md"]
+file_paths = ["config/products_parameters.md"]
 file_streams = [open(path, "rb") for path in file_paths]
 
 file_batch = client.beta.vector_stores.file_batches.upload_and_poll(
