@@ -79,9 +79,9 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: 22
         run:
-          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
-          docker stop ${{ secrets.DOCKER_REPO }} || true
-          docker rm ${{ secrets.DOCKER_REPO }} || true
-          docker run -d --name ${{ secrets.DOCKER_REPO }} -e TELEGRAM_BOT_TOKEN=$(TELEGRAM_BOT_TOKEN) -e OPENAI_API_KEY=$(OPENAI_API_KEY) ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
-        
-
+        script: |
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_REPO }:latest
+            docker stop${{ secrets.DOCKER_REPO } || true
+            docker rm ${{ secrets.DOCKER_REPO } || true
+            docker run -d --name ${{ secrets.DOCKER_REPO } -e TELEGRAM_BOT_TOKEN=$(TELEGRAM_BOT_TOKEN) -e OPENAI_API_KEY=$(OPENAI_API_KEY) -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+          
