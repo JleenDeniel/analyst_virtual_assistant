@@ -1,4 +1,4 @@
-from telegram.ext import MessageHandler, CommandHandler, filters
+from telegram.ext import MessageHandler, CommandHandler, filters # type: ignore
 from config.telegram_bot import application 
 from handlers.message_handlers import chatgpt_reply 
 from handlers.command_handlers import start_reply
