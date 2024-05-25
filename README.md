@@ -2,10 +2,10 @@
 
 Чат-бот "Ассистент Аналитика" помогает новым сотрудникам аналитических отделов, сотрудникам data science и их бадди получать необходимую информацию о бизнесе банка, особенностях его процессов, информацию по базам данных.
 
-## Логика построения проекта
+## Репо
 
 ```
-telegram_chatbot_boilerplate/
+analyst_virtual_assistant/
 │
 ├── config/
 │   ├─── openai_client.py
@@ -36,6 +36,28 @@ telegram_chatbot_boilerplate/
 - `requirements.txt` - зависимости проекта
 
 ---
+## Как поднять сервис
+Для работы с этим репозиторием нужно:
+1. Форкнуть код
+2. Добавить секреты:
+   TELEGRAM_BOT_TOKEN 
+   OPENAI_API_KEY 
+   DOCKER_USERNAME
+   DOCKER_REPO
+   SERVER_HOST
+   SERVER_LOGIN
+   SERVER_PASSWORD
+3. Сделать пуш коммита в main и запустится action, который начнет пайплайн сборки и оживления сервиса
+
+Или, можно просто на сервере сделать
+git clone
+docker build
+docker push
+docker pull <image>
+docker run
+
+*сори за такую инструкцию, просто до дедлайна считанные минуты*
+
 ## Использование бота
 
 Найти бота можно по ссылке: https://t.me/raif_virtual_assistant_bot
