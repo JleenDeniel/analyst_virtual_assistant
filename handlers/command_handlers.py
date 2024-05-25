@@ -70,7 +70,7 @@ async def mode_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # перенаправление ответа в Telegram
     await update.message.reply_text(reply, reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, input_field_placeholder="Какой твой уровень?"
+            reply_keyboard, one_time_keyboard=False, input_field_placeholder="Выбери свой уровень и задай вопрос"
         ))
 
     print("assistant:", reply)
@@ -80,13 +80,21 @@ async def mode_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def mode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Stores the selected mode and asks for a question."""
     user = update.message.from_user
-    logger.info("Mode of %s: %s", user.first_name, update.message.text)
+    logger.info(update.message.text)
+
+    f = open("utils/logs.txt", "a")
+    f.write(update.message.text+'\n')
+    f.close()
+
+    
     await update.message.reply_text(
         "Отлично, задавай свой вопрос!",
         # reply_markup=ReplyKeyboardRemove(),
     )
 
     print(update.message.text)
+
+    # return update.message.text
 
 
 async def joke_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
